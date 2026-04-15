@@ -25,6 +25,18 @@
       "className": "WebsiteBuilderMCP"
     },
     {
+      "name": "website-implementer-mcp",
+      "domain": "webdev",
+      "layer": "execution",
+      "version": "1.0.0",
+      "entry": "mcp-system/servers/website-builder-mcp.ts",
+      "enabled": true,
+      "capabilities": ["implement-functionality", "write-tests", "run-tests", "FAIL_TASK"],
+      "inputSchema": "",
+      "outputSchema": "",
+      "className": "WebsiteBuilderMCP"
+    },
+    {
       "name": "debug-mcp",
       "domain": "system",
       "layer": "debugging",
@@ -35,6 +47,30 @@
       "inputSchema": "",
       "outputSchema": "",
       "className": "DebugMCP"
+    },
+    {
+      "name": "doc-mcp",
+      "domain": "documentation",
+      "layer": "planning",
+      "version": "1.0.0",
+      "entry": "mcp-system/servers/doc-mcp.ts",
+      "enabled": true,
+      "capabilities": ["create-feature-doc"],
+      "inputSchema": "",
+      "outputSchema": "",
+      "className": "DocMCP"
+    },
+    {
+      "name": "knowledge-mcp",
+      "domain": "knowledge",
+      "layer": "context",
+      "version": "1.0.0",
+      "entry": "mcp-system/servers/knowledge-mcp.ts",
+      "enabled": true,
+      "capabilities": ["retrieve-knowledge"],
+      "inputSchema": "",
+      "outputSchema": "",
+      "className": "KnowledgeMCP"
     }
   ]
 }
