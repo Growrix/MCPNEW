@@ -1,0 +1,40 @@
+{
+  "mcps": [
+    {
+      "name": "website-planner-mcp",
+      "domain": "webdev",
+      "layer": "planning",
+      "version": "1.0.0",
+      "entry": "mcp-system/servers/website-planner-mcp.ts",
+      "enabled": true,
+      "capabilities": ["plan-website"],
+      "inputSchema": "",
+      "outputSchema": "",
+      "className": "WebsitePlannerMCP"
+    },
+    {
+      "name": "website-builder-mcp",
+      "domain": "webdev",
+      "layer": "execution",
+      "version": "1.0.0",
+      "entry": "mcp-system/servers/website-builder-mcp.ts",
+      "enabled": true,
+      "capabilities": ["build-ui", "build-api"],
+      "inputSchema": "",
+      "outputSchema": "",
+      "className": "WebsiteBuilderMCP"
+    },
+    {
+      "name": "debug-mcp",
+      "domain": "system",
+      "layer": "debugging",
+      "version": "1.0.0",
+      "entry": "mcp-system/servers/debug-mcp.ts",
+      "enabled": true,
+      "capabilities": ["debug-error"],
+      "inputSchema": "",
+      "outputSchema": "",
+      "className": "DebugMCP"
+    }
+  ]
+}

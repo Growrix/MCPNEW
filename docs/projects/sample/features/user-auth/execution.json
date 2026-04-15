@@ -1,0 +1,15 @@
+{
+   "featureId": "user-auth",
+   "status": "ready",
+   "tasks": [
+      {
+         "id": "auth-ui-001",
+         "title": "Create signup page",
+         "type": "build",
+         "owner": "website-builder-mcp",
+         "dependsOn": [],
+         "validation": ["lint", "types", "tests", "smoke"],
+         "done": false
+      }
+   ]
+}
