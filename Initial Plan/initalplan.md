@@ -6,88 +6,16 @@
 
 This document is the **Single Source of Truth (SOT)** for building:
 
-> A **fully AI-driven SaaS development system** powered by:
-
-* MCP Architecture
-* AI Execution Engine
-* Structured Documentation System
-* Autonomous Build + Debug Loop
-
----
-
-# 🚀 1. FINAL GOAL
-
-Build a system that can:
-
-```text
-Input Idea → Plan → Design → Generate Code → Run → Debug → Deploy → Improve
-```
-
----
-
-# 🧠 2. CORE SYSTEM OVERVIEW
-
-## 🔥 SYSTEM LAYERS
-
-```text
-1. Meta Layer        → Rules & Governance
-2. Documentation     → Planning Engine (DOC-MCP)
-3. Knowledge Layer   → Context Brain (Knowledge MCP)
-4. Orchestration     → Decision Engine
-5. Execution Engine  → Build System (Aider Loop)
-6. MCP Servers       → Domain Workers
-7. Observability     → Logs + Metrics
-8. Memory            → Learning System
-```
-
----
-
-# 🧩 3. BUILD STRATEGY (CRITICAL)
-
-## ❗ PRINCIPLE
-
-```text
-❝ Build ONE working SaaS pipeline first (end-to-end) ❞
-```
-
----
-
-## 🚫 DO NOT:
-
-* Build all MCPs
-* Over-document
-* Create multiple redundant files
-
----
-
-## ✅ DO:
-
-```text
-One Feature → One Source → One Execution Flow
-```
-
----
-
-# 🏗️ 4. PHASED BUILD ROADMAP
-
----
-
-# 🥇 PHASE 1 — CORE PLATFORM (FOUNDATION)
-
-## 🎯 Goal
-
-Make system **AI-executable and stable**
-
----
-
-## 4.1 MCP CONTRACT SYSTEM
-
+ 
 ### Files:
 
 ```text
 mcp-system/contracts/
  ├── mcp-interface.ts
  ├── execution-context.ts
+ ├── mcp-request.ts
+ ├── mcp-response.ts
+ └── validation-result.ts
 ```
 
 ---
@@ -99,18 +27,53 @@ interface MCPServer {
   name: string;
   domain: string;
   layer: string;
+  version: string;
 
-  execute(input: {
-    task: string;
-    context?: any;
-    metadata?: any;
-  }): Promise<{
-    success: boolean;
-    output?: any;
-    error?: string;
-  }>;
+  validate(input: MCPRequest): Promise<ValidationResult>;
+  execute(input: MCPRequest, context: ExecutionContext): Promise<MCPResponse>;
+  healthCheck(): Promise<{ success: boolean; details?: any }>;
+  capabilities(): string[];
+}
+
+interface MCPRequest {
+  task: string;
+  goal?: string;
+  constraints?: string[];
+  context?: any;
+  metadata?: {
+    featureId?: string;
+    projectId?: string;
+    priority?: 'low' | 'medium' | 'high';
+    requestedBy?: 'user' | 'system' | 'agent';
+  };
+}
+
+interface MCPResponse {
+  success: boolean;
+  output?: any;
+  artifacts?: string[];
+  logs?: string[];
+  nextActions?: string[];
+  error?: string;
+  retryable?: boolean;
+}
+
+interface ValidationResult {
+  valid: boolean;
+  errors?: string[];
+  warnings?: string[];
 }
 ```
+
+---
+
+### MCP Contract Rules
+
+* Every MCP must validate input before execution
+* Every MCP must return structured output, not raw text only
+* Every MCP must expose health status
+* Every MCP must produce logs/artifacts for orchestration
+* Every MCP must declare capabilities for routing
 
 ---
 
@@ -119,18 +82,55 @@ interface MCPServer {
 ```ts
 interface ExecutionContext {
   taskId: string;
+  runId: string;
+  projectId: string;
+  featureId: string;
   domain: string;
   layer: string;
-
+  status:
+    | 'queued'
+    | 'planning'
+    | 'executing'
+    | 'validating'
+    | 'retrying'
+    | 'blocked'
+    | 'completed'
+    | 'failed';
+  retryCount: number;
+  maxRetries: number;
   history: {
     step: string;
+    status: 'success' | 'failed' | 'skipped';
     result?: any;
     error?: string;
+    timestamp: string;
   }[];
-
+  artifacts: string[];
   knowledge?: any;
+  constraints?: string[];
 }
 ```
+
+---
+
+### Lifecycle State Machine
+
+```text
+queued → planning → executing → validating
+                      ↓           ↓
+                   blocked     success
+                      ↓           ↓
+                    failed ← retrying
+```
+
+---
+
+### Failure Policy
+
+* Retry only on retryable errors
+* Max retry count must be explicit in context
+* If validation fails 3 times, escalate to debug-mcp
+* If debug-mcp fails, mark task blocked with root-cause artifact
 
 ---
 
@@ -141,9 +141,24 @@ interface ExecutionContext {
   "name": "website-builder-mcp",
   "domain": "webdev",
   "layer": "execution",
-  "entry": "path-to-implementation"
+  "version": "1.0.0",
+  "entry": "src/mcps/website-builder/index.ts",
+  "enabled": true,
+  "capabilities": ["build-ui", "build-api", "wire-db"],
+  "inputSchema": "schemas/website-builder-input.json",
+  "outputSchema": "schemas/website-builder-output.json"
 }
 ```
+
+---
+
+## MCP Registry Rules
+
+* Registry must be machine-readable JSON
+* Each entry must map to a real implementation file
+* Each MCP must declare input/output schemas
+* Disabled MCPs must never be selected by orchestrator
+* Orchestrator must route by capability first, name second
 
 ---
 
@@ -155,12 +170,61 @@ Task → Knowledge Retrieval → Context → Prompt → Execution
 
 ---
 
+## Knowledge Retrieval Rules
+
+* Raw knowledge cannot go directly into prompts
+* Knowledge must be filtered into task-relevant context
+* Context package must include source references
+* Context size must be token-budget aware
+* Approved knowledge only may influence code generation by default
+
+---
+
+## Required Prompt Package
+
+Every execution prompt must contain:
+
+* Task objective
+* Constraints
+* Accepted architecture rules
+* Relevant knowledge excerpts
+* Expected output schema
+* Validation checklist
+* Retry instruction on failure
+
+---
+
 ## 4.4 VALIDATION SYSTEM
 
 * Build Checker (tsc)
 * Test Runner (vitest)
 * Lint Checker (required)
 * Code Validator (required)
+* Type Safety Check (required)
+* Contract Schema Check (required)
+* Smoke Run (required)
+
+---
+
+## Validation Gate Policy
+
+```text
+No AI-generated change is accepted until:
+lint = pass
+types = pass
+tests = pass
+smoke = pass
+contracts = pass
+```
+
+---
+
+## Required Validation Outputs
+
+* exit code
+* failure summary
+* changed files
+* retry recommendation
 
 ---
 
@@ -186,6 +250,14 @@ Task → Knowledge Retrieval → Context → Prompt → Execution
 Wrap execution-runtime into MCP
 ```
 
+### Must Do
+
+* Receive structured tasks from orchestrator
+* Execute deterministic task steps
+* Store logs, outputs, artifacts
+* Trigger validators automatically
+* Return retryable vs non-retryable failures
+
 ---
 
 ## 4.6 debug-mcp
@@ -195,6 +267,14 @@ Wrap execution-runtime into MCP
 ```text
 Error → Analyze → Fix Strategy → Retry
 ```
+
+### Must Do
+
+* Parse runtime, build, lint, type, and test errors
+* Classify root cause
+* Generate minimal fix plan
+* Hand fix plan back to builder/execution layer
+* Stop infinite retry loops
 
 ---
 
@@ -234,6 +314,20 @@ Error → Analyze → Fix Strategy → Retry
 * DB schema
 * Tasks
 
+### Required Artifacts
+
+```text
+feature.md
+execution.json
+schema.json
+acceptance.md
+```
+
+### Planner Output Rule
+
+Planner must output executable tasks only.
+No vague items like "build frontend" or "make backend better".
+
 ---
 
 ## 4.9 website-builder-mcp
@@ -244,6 +338,14 @@ Error → Analyze → Fix Strategy → Retry
 Execute build tasks
 ```
 
+### Must Produce
+
+* Working code
+* Updated dependency graph
+* Validation results
+* Run instructions
+* Deployment-ready artifact
+
 ---
 
 ## 4.10 analysis-mcp
@@ -253,6 +355,10 @@ Execute build tasks
 ```text
 Analyze code, UX, performance
 ```
+
+### Rule
+
+Analysis MCP cannot block MVP build unless it finds a release-critical issue.
 
 ---
 
@@ -291,6 +397,20 @@ Idea
 
 ---
 
+## End-to-End Success Definition
+
+System is considered working only if one command or orchestrated run can:
+
+* read feature source
+* generate executable task list
+* build the app
+* run validations
+* auto-fix at least one induced failure
+* produce a deployable output
+* store logs and artifacts for the whole run
+
+---
+
 ## 🎯 Goal
 
 Build ONE REAL SaaS APP
@@ -307,6 +427,10 @@ Build ONE REAL SaaS APP
 * E2E Testing
 * Task Decomposition
 * Performance optimization
+* Rollback strategy
+* Cost tracking
+* Rate limit handling
+* Security review
 
 ---
 
@@ -384,6 +508,55 @@ status:
 
 ---
 
+## REQUIRED FRONTMATTER
+
+```md
+---
+title: user-auth
+domain: saas-core
+status: planned
+priority: high
+owner: orchestrator
+depends_on: []
+acceptance_tests:
+   - signup works
+   - login works
+   - logout works
+---
+```
+
+---
+
+## execution.json STRUCTURE
+
+```json
+{
+   "featureId": "user-auth",
+   "status": "ready",
+   "tasks": [
+      {
+         "id": "auth-ui-001",
+         "title": "Create signup page",
+         "type": "build",
+         "owner": "website-builder-mcp",
+         "dependsOn": [],
+         "validation": ["lint", "types", "tests", "smoke"],
+         "done": false
+      }
+   ]
+}
+```
+
+---
+
+## Documentation Rule
+
+feature.md explains intent.
+execution.json drives execution.
+No third planning file is allowed.
+
+---
+
 # 🧠 6. FOLDER STRUCTURE
 
 ---
@@ -404,6 +577,10 @@ knowledge/
 knowledge-source/
 mcp-system/
 execution-runtime/
+apps/
+deploy/
+observability/
+memory/
 ```
 
 ---
@@ -431,6 +608,34 @@ knowledge/
 
 ---
 
+## REQUIRED EXECUTION DIRECTORIES
+
+```text
+mcp-system/
+ ├── contracts/
+ ├── registry/
+ ├── orchestrator/
+ └── servers/
+
+execution-runtime/
+ ├── runner/
+ ├── validators/
+ ├── debugger/
+ └── state/
+
+observability/
+ ├── logs/
+ ├── metrics/
+ └── traces/
+
+deploy/
+ ├── docker/
+ ├── scripts/
+ └── manifests/
+```
+
+---
+
 # ⚙️ 7. EXECUTION ENGINE
 
 ---
@@ -448,6 +653,16 @@ Task → Aider → Run → Error → Debug → Retry → Success
 * State Manager
 * Error Parser
 * Escalation Strategy
+* Artifact Writer
+* Validation Runner
+* Retry Controller
+
+---
+
+## Execution Engine Rule
+
+Execution engine is not just a code generator.
+It is a controlled runtime that must track state, validate outputs, and decide retry vs escalate.
 
 ---
 
@@ -461,6 +676,24 @@ Task → Aider → Run → Error → Debug → Retry → Success
 * Select MCP
 * Build prompt
 * Execute flow
+* Merge validation feedback
+* Persist run state
+* Escalate blocked tasks
+
+---
+
+## Orchestrator Routing Order
+
+```text
+1. validate task
+2. load feature context
+3. retrieve approved knowledge
+4. select MCP by capability
+5. execute
+6. validate
+7. retry or escalate
+8. persist final state
+```
 
 ---
 
@@ -485,6 +718,40 @@ Debug MCP
    ↓
 Output
 ```
+
+---
+
+# 🧪 9.1 AI BUILDING-FRIENDLY RULES
+
+## Every AI Step Must Be Machine-Consumable
+
+AI components must never rely on vague prose only.
+Every major step must emit structured artifacts.
+
+---
+
+## Mandatory AI Output Formats
+
+* planner → JSON task list
+* builder → changed files + validation result
+* debugger → root cause + fix strategy + retry decision
+* orchestrator → run summary + status + artifact paths
+
+---
+
+## Prompting Rule
+
+Prompt must request exact output shape.
+If output shape is not defined, the task is not ready for execution.
+
+---
+
+## Token Discipline
+
+* Pass only relevant feature context
+* Prefer summaries plus source refs over dumping raw docs
+* Store long-term knowledge outside prompt
+* Use artifacts for persistence, not prompt repetition
 
 ---
 
@@ -528,6 +795,22 @@ Build vertical slice first
 
 ```text
 AI needs structure, not volume
+```
+
+---
+
+## RULE 6
+
+```text
+No optional module before first green E2E demo
+```
+
+---
+
+## RULE 7
+
+```text
+Every phase must end with a runnable proof
 ```
 
 ---
@@ -595,6 +878,74 @@ Build:
 ## STEP 6
 
 Test with ONE SaaS App
+
+---
+
+## STEP 7
+
+Deploy that SaaS app through the same orchestration system
+
+---
+
+## STEP 8
+
+Induce one failure intentionally and confirm debug-mcp recovers it
+
+---
+
+# ✅ 13. MINIMUM E2E ACCEPTANCE TARGET
+
+The first end-to-end implementation is complete only when the system can build one small SaaS app such as:
+
+* Landing page
+* Authentication
+* Dashboard
+* One CRUD module
+* Database connection
+* Tests
+* Deployment output
+
+---
+
+## Mandatory E2E Proof
+
+```text
+Input feature
+→ planner creates execution.json
+→ builder generates app
+→ runtime runs validators
+→ debug-mcp fixes at least one failure
+→ app runs locally
+→ deploy artifact is created
+→ logs and metrics are stored
+```
+
+---
+
+# 🚀 14. IMPLEMENTATION PRIORITY ORDER
+
+```text
+1. contracts
+2. registry
+3. orchestrator
+4. execution runtime
+5. validators
+6. debug loop
+7. planner MCP
+8. builder MCP
+9. one SaaS template/app
+10. deployment pipeline
+```
+
+---
+
+# 🔒 15. NON-NEGOTIABLES
+
+* No hidden manual step in the core E2E flow
+* No phase may be marked complete without proof artifact
+* No MCP may return unstructured output only
+* No deployment claim without runnable deploy script or manifest
+* No "AI-ready" claim unless prompts, schemas, retries, and validations are defined
 
 ---
 
