@@ -1,0 +1,56 @@
+{
+  "pages": [
+    "landing",
+    "dashboard"
+  ],
+  "tasks": [
+    {
+      "id": "task1",
+      "title": "Build landing page UI",
+      "type": "build",
+      "capability": "build-ui"
+    },
+    {
+      "id": "task2",
+      "title": "Build signup form",
+      "type": "build",
+      "capability": "build-ui"
+    },
+    {
+      "id": "task3",
+      "title": "Build simple dashboard UI",
+      "type": "build",
+      "capability": "build-ui"
+    },
+    {
+      "id": "task4",
+      "title": "Implement landing page functionality",
+      "type": "implement",
+      "capability": "implement-functionality"
+    },
+    {
+      "id": "task5",
+      "title": "Implement signup form functionality",
+      "type": "implement",
+      "capability": "implement-functionality"
+    },
+    {
+      "id": "task6",
+      "title": "Implement dashboard functionality",
+      "type": "implement",
+      "capability": "implement-functionality"
+    },
+    {
+      "id": "task7",
+      "title": "Write acceptance tests",
+      "type": "test",
+      "capability": "write-tests"
+    },
+    {
+      "id": "task8",
+      "title": "Run acceptance tests",
+      "type": "test",
+      "capability": "run-tests"
+    }
+  ]
+}

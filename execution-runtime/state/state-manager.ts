@@ -1,4 +1,4 @@
-import { ExecutionContext } from '../contracts/execution-context';
+import { ExecutionContext } from '../../mcp-system/contracts/execution-context';
 
 export class StateManager {
   private contexts: Map<string, ExecutionContext> = new Map();

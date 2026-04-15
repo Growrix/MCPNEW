@@ -1,0 +1,10 @@
+{
+  "name": "saas-demo",
+  "version": "1.0.0",
+  "description": "SaaS Demo App",
+  "scripts": {
+    "build-ui": "mkdir -p dist && cp index.html dist/index.html"
+  },
+  "author": "You",
+  "license": "ISC"
+}

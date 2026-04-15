@@ -1,0 +1,10 @@
+{
+  "pages": ["landing", "dashboard"],
+  "tasks": [
+    { "id": "task1", "title": "Build landing page UI", "type": "build", "capability": "build-ui" },
+    { "id": "task2", "title": "Implement signup form", "type": "build", "capability": "build-form" },
+    { "id": "task3", "title": "Build simple dashboard UI", "type": "build", "capability": "build-ui" },
+    { "id": "task4", "title": "Implement landing page functionality", "type": "build", "capability": "build-logic" },
+    { "id": "task5", "title": "Implement dashboard functionality", "type": "build", "capability": "build-logic" }
+  ]
+}
